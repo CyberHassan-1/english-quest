@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a0128">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Baloo+2:wght@600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Baloo+2:wght@600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg-0:#020103;
@@ -92,17 +92,17 @@
 
 /* ================= SOUND (real recorded SFX, WebAudio beep as safety fallback) ================= */
 const SOUND_FILES = {
-  correct:       'sounds/correct.mp3',
-  wrong:         'sounds/wrong.mp3',
-  coin:          'sounds/coin.mp3',
-  click:         'sounds/click.mp3',
-  tap:           'sounds/tap.mp3',
-  levelup:       'sounds/level-up.mp3',
-  stageComplete: 'sounds/stage-complete.mp3',
-  worldUnlock:   'sounds/world-unlock.mp3',
-  achievement:   'sounds/achievement.mp3',
-  bossIntro:     'sounds/boss-intro.mp3',
-  uiPop:         'sounds/ui-pop.mp3',
+  correct:       'correct.mp3',
+  wrong:         'wrong.mp3',
+  coin:          'coin.mp3',
+  click:         'click.mp3',
+  tap:           'tap.mp3',
+  levelup:       'level-up.mp3',
+  stageComplete: 'stage-complete.mp3',
+  worldUnlock:   'world-unlock.mp3',
+  achievement:   'achievement.mp3',
+  bossIntro:     'boss-intro.mp3',
+  uiPop:         'ui-pop.mp3',
 };
 
 /* Many script parts omitted for brevity in this message; only the persistence functions were changed */
@@ -159,6 +159,26 @@ async function saveProgress(){
     setSaveIndicator('error');
   }
 }
+
+/* Quick bootstrap: load saved progress on page load and auto-save periodically + on unload */
+(async function(){
+  try{
+    await loadProgress();
+  }catch(e){
+    console.warn('loadProgress failed', e);
+  }
+  // hide loading screen if present
+  const ls = document.getElementById('loadingScreen');
+  if(ls) ls.style.display = 'none';
+
+  // autosave every 5 seconds (lightweight)
+  try{ setInterval(saveProgress, 5000); }catch(e){}
+
+  // save before unload
+  window.addEventListener('beforeunload', function(e){
+    try{ saveProgress(); }catch(err){}
+  });
+})();
 
 /* Rest of application script remains unchanged. */
 
