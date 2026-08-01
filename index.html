@@ -273,6 +273,9 @@
   .stage-node.n4{align-self:flex-end; margin-inline-end:4%;}
   .stage-node.n5{align-self:flex-start; margin-inline-start:6%;}
   .stage-node.n6{align-self:center;}
+  .stage-node.n7{align-self:flex-end; margin-inline-end:12%;}
+  .stage-node.n8{align-self:flex-start; margin-inline-start:14%;}
+  .stage-node.n9{align-self:center;}
   .stage-node.unlocked{
     background:linear-gradient(145deg,var(--violet),var(--violet-deep));
     color:#fff; box-shadow:0 6px 0 #5a3fc4, 0 0 26px rgba(167,139,250,.5);
@@ -309,6 +312,11 @@
   }
   .q-card .prompt-en{font-family:'Baloo 2'; font-size:30px; margin-bottom:6px;}
   .q-card .prompt-sub{color:var(--text-dim); font-size:14px;}
+  .q-card .blend-tag{
+    display:inline-block; background:rgba(0,240,255,.12); border:1px solid rgba(0,240,255,.35);
+    color:var(--cyan); font-family:var(--mono); font-weight:800; font-size:13px;
+    padding:3px 10px; border-radius:8px; margin-bottom:10px; letter-spacing:1px;
+  }
   .options{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   .opt-btn{
     background:var(--glass); border:2px solid var(--glass-border); border-radius:16px;
@@ -321,6 +329,8 @@
   .opt-btn.wrong{background:rgba(255,45,106,.15); border-color:var(--coral); color:var(--coral); box-shadow:0 0 22px rgba(255,45,106,.4); animation:shake .4s;}
   @keyframes correctPulse{0%{transform:scale(1);} 40%{transform:scale(1.05);} 100%{transform:scale(1);}}
   @keyframes shake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);}}
+
+  .swatch{width:22px; height:22px; border-radius:6px; display:inline-block; vertical-align:middle; margin-inline-end:8px; border:2px solid rgba(255,255,255,.3);}
 
   .match-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .match-item{background:var(--glass); border:2px solid var(--glass-border); border-radius:14px; padding:14px 8px; text-align:center; font-weight:600;}
@@ -430,8 +440,8 @@
       <h1 class="display glitch" data-text="English Quest">English Quest</h1>
       <p>رحلتك التفاعلية لتعلم الإنجليزية — من A1 إلى C2، عالم واحد كل مرة، ومهارة حقيقية تكتسبها كل مرحلة.</p>
       <div class="stat-row">
-        <div class="stat-card"><b>12</b><span>مرحلة جاهزة</span></div>
-        <div class="stat-card"><b>70+</b><span>كلمة</span></div>
+        <div class="stat-card"><b>16</b><span>مرحلة جاهزة</span></div>
+        <div class="stat-card"><b>90+</b><span>كلمة</span></div>
         <div class="stat-card"><b>2</b><span>عالم</span></div>
       </div>
       <button class="btn-primary" onclick="App.start()">ابدأ الرحلة</button>
@@ -451,8 +461,8 @@
       <div class="save-note" id="saveNote"><span class="save-dot" id="saveDot"></span><span id="saveText">محفوظ</span></div>
     </div>
     <div class="path-wrap">
-      <svg class="path-svg" id="pathSvg" viewBox="0 0 340 560" preserveAspectRatio="none">
-        <path id="mapRoutePath" d="M 90 30 C 40 90, 40 130, 260 170 S 300 250, 60 290 S 30 360, 220 400 S 250 470, 170 500"
+      <svg class="path-svg" id="pathSvg" viewBox="0 0 340 720" preserveAspectRatio="none">
+        <path id="mapRoutePath" d="M 90 30 C 40 90, 40 130, 260 170 S 300 250, 60 290 S 30 360, 220 400 S 250 470, 170 500 S 60 570, 260 610 S 250 670, 150 690"
           fill="none" stroke="rgba(255,255,255,.15)" stroke-width="4" stroke-dasharray="2 14" stroke-linecap="round"/>
         <circle r="4" fill="#00f0ff" opacity=".85">
           <animateMotion dur="7s" repeatCount="indefinite" rotate="auto">
@@ -531,14 +541,42 @@
   }
 })();
 
-/* ================= SOUND (WebAudio, no files) ================= */
+/* ================= SOUND (real recorded SFX, WebAudio beep as safety fallback) =================
+   كل صوت مأخوذ من ملفات mp3 حقيقية بمجلد /sounds — إذا الملف ما تحمّل (رابط مكسور مثلاً)
+   يرجع تلقائياً لصوت بديل مولّد برمجياً حتى ما تنكتم اللعبة أبداً. */
+const SOUND_FILES = {
+  correct:       'sounds/correct.mp3',        // dragon-studio-correct
+  wrong:         'sounds/wrong.mp3',           // universfield-wrong-answer-beep
+  coin:          'sounds/coin.mp3',            // dragon-studio-coins-dropping
+  click:         'sounds/click.mp3',           // universfield-click-button (تنقل عام: رجوع/تابات/عقد الخريطة)
+  tap:           'sounds/tap.mp3',             // vadim_makes_sound-soft-app-button-tap (اختيار إجابة/كلمة)
+  levelup:       'sounds/level-up.mp3',        // dragon-studio-level-up-sound (مودال مستوى جديد)
+  stageComplete: 'sounds/stage-complete.mp3',  // universfield-level-up-08 (إنهاء أي مرحلة عادية)
+  worldUnlock:   'sounds/world-unlock.mp3',    // freesound_community-level-up (فتح عالم جديد)
+  achievement:   'sounds/achievement.mp3',     // universfield-achievement-unlock (أداء مثالي بلا أخطاء)
+  bossIntro:     'sounds/boss-intro.mp3',      // audioatlant cinematic (دخول مرحلة الزعيم)
+  uiPop:         'sounds/ui-pop.mp3',          // arnav_geddada-ui-sound (فتح أي مرحلة عادية)
+};
+
 const Sound = (() => {
-  let ctx; let muted = false;
-  function ensure(){ if(!ctx) ctx = new (window.AudioContext||window.webkitAudioContext)(); return ctx; }
-  function beep(freq, dur, type='sine', vol=.15){
+  let muted = false;
+  let ctx; // WebAudio fallback only
+  const cache = {};
+
+  // تحميل مسبق لكل الملفات الحقيقية
+  Object.entries(SOUND_FILES).forEach(([key, src]) => {
+    try{
+      const audio = new Audio(src);
+      audio.preload = 'auto';
+      cache[key] = audio;
+    }catch(e){ cache[key] = null; }
+  });
+
+  function ensureCtx(){ if(!ctx) ctx = new (window.AudioContext||window.webkitAudioContext)(); return ctx; }
+  function fallbackBeep(freq, dur, type='sine', vol=.15){
     if(muted) return;
     try{
-      const c = ensure();
+      const c = ensureCtx();
       const o = c.createOscillator(); const g = c.createGain();
       o.type = type; o.frequency.value = freq;
       g.gain.value = vol;
@@ -548,12 +586,31 @@ const Sound = (() => {
       o.stop(c.currentTime + dur);
     }catch(e){}
   }
+
+  function play(key, vol=1){
+    if(muted) return;
+    const base = cache[key];
+    if(!base){ fallbackBeep(440,.1); return; }
+    try{
+      const node = base.cloneNode(true); // clone يسمح بتراكب أصوات سريعة متتالية بدون قطع بعضها
+      node.volume = vol;
+      const p = node.play();
+      if(p && p.catch) p.catch(()=>fallbackBeep(440,.1));
+    }catch(e){ fallbackBeep(440,.1); }
+  }
+
   return {
-    correct(){ beep(660,.12); setTimeout(()=>beep(880,.15),90); },
-    wrong(){ beep(180,.25,'sawtooth',.12); },
-    coin(){ beep(1200,.08,'square',.06); },
-    levelup(){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.2),i*90)); },
-    click(){ beep(400,.05,'triangle',.05); },
+    correct(){ play('correct'); },
+    wrong(){ play('wrong', .9); },
+    coin(){ play('coin', .8); },
+    click(){ play('click', .7); },
+    tap(){ play('tap', .8); },
+    levelup(){ play('levelup'); },
+    stageComplete(){ play('stageComplete'); },
+    worldUnlock(){ play('worldUnlock'); },
+    achievement(){ play('achievement'); },
+    bossIntro(){ play('bossIntro', .8); },
+    uiPop(){ play('uiPop', .7); },
     toggleMute(){ muted = !muted; return muted; },
     isMuted(){ return muted; }
   };
@@ -635,12 +692,49 @@ function decryptReveal(el, text, opts={}){
 /* ================= WORLD / STAGE DATA =================
    Adding a new world = adding another object to WORLDS.
    Adding a new stage = adding another object to a world's `stages` array.
-   The engine below reads this data generically — no per-stage code needed. */
+   The engine below reads this data generically — no per-stage code needed.
+
+   منهج المرحلة A1 (قرية البداية) مبني بترتيب تعليمي منطقي:
+   1) الألوان كاختيارات (مفردات بصرية بسيطة تبني ثقة سريعة)
+   2) حروف مركبة SH/CH/TH/WH (صوت واحد لحرفين — أساس النطق الصحيح)
+   3) حروف مركبة PH/QU/CK/NG (تكملة الأصوات المركبة الشائعة)
+   4) أول جملة — تركيب جملة كاملة من مفردات المراحل السابقة فعلاً
+   5) التحيات، 6) الأرقام، 7) العائلة، 8) الطعام — مفردات تأسيسية
+   9) تحدي الزعيم — مراجعة شاملة لكل شيء أعلاه قبل فتح عالم A2 */
 const WORLDS = [
   {
     id:'village', name:'قرية البداية', level:'A1',
     stages:[
-      { id:1, icon:'👋', title:'التحيات', type:'mcq',
+      { id:1, icon:'🎨', title:'الألوان', type:'mcq',
+        questions:[
+          {en:'Red', ar:'أحمر', swatch:'#e63946', options:['أحمر','أزرق','أخضر','أصفر'], correct:0},
+          {en:'Blue', ar:'أزرق', swatch:'#3a86ff', options:['أخضر','أزرق','أسود','أبيض'], correct:1},
+          {en:'Green', ar:'أخضر', swatch:'#2ecc71', options:['أصفر','بنفسجي','أخضر','أحمر'], correct:2},
+          {en:'Yellow', ar:'أصفر', swatch:'#ffd60a', options:['أصفر','أزرق','بني','أسود'], correct:0},
+          {en:'Black', ar:'أسود', swatch:'#111111', options:['أبيض','رمادي','أسود','أحمر'], correct:2},
+        ]},
+      { id:2, icon:'🔤', title:'حروف مركبة: SH CH TH WH', type:'mcq', blend:'SH · CH · TH · WH',
+        questions:[
+          {en:'Ship', ar:'سفينة (SH)', options:['سفينة','سيارة','طائرة','قطار'], correct:0},
+          {en:'Chair', ar:'كرسي (CH)', options:['طاولة','كرسي','باب','نافذة'], correct:1},
+          {en:'This', ar:'هذا (TH)', options:['ذلك','هذا','هؤلاء','هناك'], correct:1},
+          {en:'What', ar:'ماذا (WH)', options:['متى','أين','ماذا','من'], correct:2},
+          {en:'Fish', ar:'سمكة (SH)', options:['سمكة','طائر','كلب','قطة'], correct:0},
+        ]},
+      { id:3, icon:'🔠', title:'حروف مركبة: PH QU CK NG', type:'mcq', blend:'PH · QU · CK · NG',
+        questions:[
+          {en:'Phone', ar:'هاتف (PH)', options:['كتاب','هاتف','قلم','ساعة'], correct:1},
+          {en:'Queen', ar:'ملكة (QU)', options:['ملكة','ملك','أمير','جندي'], correct:0},
+          {en:'Duck', ar:'بطة (CK)', options:['دجاجة','بطة','ديك','أوزة'], correct:1},
+          {en:'Sing', ar:'يغني (NG)', options:['يجري','يقفز','يغني','ينام'], correct:2},
+          {en:'Photo', ar:'صورة (PH)', options:['رسالة','خريطة','صورة','ورقة'], correct:2},
+        ]},
+      { id:4, icon:'✍️', title:'أول جملة لي', type:'arrange',
+        questions:[
+          {words:['I','like','blue'], answer:'I like blue', ar:'أنا أحب اللون الأزرق'},
+          {words:['This','is','a','ship'], answer:'This is a ship', ar:'هذه سفينة'},
+        ]},
+      { id:5, icon:'👋', title:'التحيات', type:'mcq',
         questions:[
           {en:'Hello', ar:'مرحباً', options:['مرحباً','وداعاً','شكراً','آسف'], correct:0},
           {en:'Good morning', ar:'صباح الخير', options:['مساء الخير','صباح الخير','تصبح على خير','مع السلامة'], correct:1},
@@ -648,27 +742,23 @@ const WORLDS = [
           {en:'Goodbye', ar:'وداعاً', options:['مرحباً','وداعاً','نعم','لا'], correct:1},
           {en:'Please', ar:'من فضلك', options:['من فضلك','شكراً','آسف','أهلاً'], correct:0},
         ]},
-      { id:2, icon:'🔢', title:'الأرقام', type:'match',
+      { id:6, icon:'🔢', title:'الأرقام', type:'match',
         pairs:[ ['One','واحد'], ['Two','اثنان'], ['Three','ثلاثة'], ['Four','أربعة'] ] },
-      { id:3, icon:'🎨', title:'الألوان', type:'fill',
-        questions:[
-          {sentence:'The sky is ____', answer:'blue', hint:'أزرق'},
-          {sentence:'The apple is ____', answer:'red', hint:'أحمر'},
-          {sentence:'The grass is ____', answer:'green', hint:'أخضر'},
-        ]},
-      { id:4, icon:'👨‍👩‍👧', title:'العائلة', type:'arrange',
+      { id:7, icon:'👨‍👩‍👧', title:'العائلة', type:'arrange',
         questions:[
           {words:['This','is','my','mother'], answer:'This is my mother', ar:'هذه أمي'},
           {words:['I','love','my','family'], answer:'I love my family', ar:'أحب عائلتي'},
         ]},
-      { id:5, icon:'🍎', title:'الطعام', type:'match',
+      { id:8, icon:'🍎', title:'الطعام', type:'match',
         pairs:[ ['Apple','تفاحة'], ['Bread','خبز'], ['Water','ماء'], ['Milk','حليب'] ] },
-      { id:6, icon:'👑', title:'تحدي الزعيم', type:'mcq', boss:true,
+      { id:9, icon:'👑', title:'تحدي الزعيم', type:'mcq', boss:true,
         questions:[
+          {en:'Blue', ar:'أزرق', options:['أخضر','أزرق','أسود','أبيض'], correct:1},
+          {en:'Ship', ar:'سفينة (SH)', options:['سفينة','سيارة','طائرة','قطار'], correct:0},
+          {en:'Queen', ar:'ملكة (QU)', options:['ملكة','ملك','أمير','جندي'], correct:0},
           {en:'Good morning', ar:'صباح الخير', options:['مساء الخير','صباح الخير','وداعاً','آسف'], correct:1},
           {en:'Apple', ar:'تفاحة', options:['خبز','حليب','تفاحة','ماء'], correct:2},
           {en:'Three', ar:'ثلاثة', options:['اثنان','ثلاثة','أربعة','واحد'], correct:1},
-          {en:'Blue', ar:'أزرق', options:['أحمر','أخضر','أزرق','أصفر'], correct:2},
           {en:'Family', ar:'عائلة', options:['صديق','عائلة','معلم','جار'], correct:1},
         ]},
     ]
@@ -676,7 +766,7 @@ const WORLDS = [
   {
     id:'forest', name:'الغابة الساحرة', level:'A2', requiresWorldComplete:'village',
     stages:[
-      { id:7, icon:'🐾', title:'الحيوانات', type:'mcq',
+      { id:10, icon:'🐾', title:'الحيوانات', type:'mcq',
         questions:[
           {en:'Dog', ar:'كلب', options:['قطة','كلب','أسد','طائر'], correct:1},
           {en:'Cat', ar:'قطة', options:['قطة','كلب','فأر','حصان'], correct:0},
@@ -684,22 +774,22 @@ const WORLDS = [
           {en:'Fish', ar:'سمكة', options:['سمكة','دب','أرنب','ذئب'], correct:0},
           {en:'Lion', ar:'أسد', options:['نمر','أسد','فأر','بطة'], correct:1},
         ]},
-      { id:8, icon:'⛅', title:'الطقس', type:'match',
+      { id:11, icon:'⛅', title:'الطقس', type:'match',
         pairs:[ ['Sunny','مشمس'], ['Rainy','ماطر'], ['Windy','عاصف'], ['Cloudy','غائم'] ] },
-      { id:9, icon:'📅', title:'أيام الأسبوع', type:'fill',
+      { id:12, icon:'📅', title:'أيام الأسبوع', type:'fill',
         questions:[
           {sentence:'Today is ____ (Sunday)', answer:'sunday', hint:'الأحد'},
           {sentence:'Tomorrow is ____ (Monday)', answer:'monday', hint:'الإثنين'},
           {sentence:'The weekend starts on ____ (Friday)', answer:'friday', hint:'الجمعة'},
         ]},
-      { id:10, icon:'🏃', title:'الأفعال اليومية', type:'arrange',
+      { id:13, icon:'🏃', title:'الأفعال اليومية', type:'arrange',
         questions:[
           {words:['She','goes','to','school'], answer:'She goes to school', ar:'هي تذهب إلى المدرسة'},
           {words:['We','play','every','day'], answer:'We play every day', ar:'نحن نلعب كل يوم'},
         ]},
-      { id:11, icon:'⏰', title:'الوقت', type:'match',
+      { id:14, icon:'⏰', title:'الوقت', type:'match',
         pairs:[ ['Morning','صباح'], ['Noon','ظهر'], ['Evening','مساء'], ['Night','ليل'] ] },
-      { id:12, icon:'👑', title:'تحدي الزعيم', type:'mcq', boss:true,
+      { id:15, icon:'👑', title:'تحدي الزعيم', type:'mcq', boss:true,
         questions:[
           {en:'Dog', ar:'كلب', options:['قطة','كلب','أسد','طائر'], correct:1},
           {en:'Rainy', ar:'ماطر', options:['مشمس','ماطر','عاصف','غائم'], correct:1},
@@ -879,7 +969,8 @@ const App = (() => {
       const isDone = !!State.completed[st.id];
       const isUnlocked = isDone || i === unlockedIndex;
       const node = document.createElement('div');
-      node.className = 'stage-node n'+(i+1) + (isDone?' done':(isUnlocked?' unlocked':'')) + (st.boss?' boss':'');
+      const col = ((i % 9) + 1);
+      node.className = 'stage-node n'+col + (isDone?' done':(isUnlocked?' unlocked':'')) + (st.boss?' boss':'');
       node.setAttribute('tabindex', isUnlocked ? '0':'-1');
       node.innerHTML = isUnlocked ? st.icon : '<span class="lock">🔒</span>';
       if(isDone){ node.innerHTML = '✓'; }
@@ -898,6 +989,8 @@ const App = (() => {
     currentStage = stage; correctCount=0; wrongAttempts=0; sessionXp=0; sessionCoins=0; masteredCount=0; combo=0;
     queue = (stage.type==='match') ? [0] : stage.questions.map((_,i)=>i);
     document.getElementById('playTitle').textContent = stage.icon+' '+stage.title;
+    // دخول مرحلة عادية = صوت انتقال خفيف، دخول مرحلة زعيم = مقطع سينمائي أطول يبني التوتر
+    if(stage.boss) Sound.bossIntro(); else Sound.uiPop();
     updateComboUI();
     renderDots();
     renderQuestion();
@@ -933,9 +1026,12 @@ const App = (() => {
     if(type==='mcq'){
       const q = currentStage.questions[queue[0]];
       mcqPicked = null;
+      const blendTag = currentStage.blend ? `<div class="blend-tag mono">${currentStage.blend}</div>` : '';
+      const swatchHtml = q.swatch ? `<span class="swatch" style="background:${q.swatch};"></span>` : '';
       area.innerHTML = `
         <div class="q-card">
-          <div class="prompt-en" id="mcqPromptEn"></div>
+          ${blendTag}
+          <div class="prompt-en">${swatchHtml}<span id="mcqPromptEn"></span></div>
           <div class="prompt-sub">اختر الترجمة الصحيحة، ثم اضغط "تحقق" <button class="speak-btn" id="mcqSpeak" title="استمع للنطق">🔊</button></div>
         </div>
         <div class="options" id="mcqOpts"></div>`;
@@ -958,7 +1054,7 @@ const App = (() => {
           mcqPicked = optObj.orig;
           [...optWrap.children].forEach(c=>c.classList.remove('selected'));
           b.classList.add('selected');
-          Sound.click();
+          Sound.tap();
           setCheckEnabled(true);
         };
         optWrap.appendChild(b);
@@ -996,7 +1092,7 @@ const App = (() => {
         assembled.innerHTML=''; bank.innerHTML='';
         arrangeChosen.forEach((w,idx)=>{
           const chip=document.createElement('div'); chip.className='word-chip'; chip.textContent=w;
-          chip.onclick=()=>{ arrangeChosen.splice(idx,1); renderChips(); setCheckEnabled(arrangeChosen.length===q.words.length); };
+          chip.onclick=()=>{ Sound.tap(); arrangeChosen.splice(idx,1); renderChips(); setCheckEnabled(arrangeChosen.length===q.words.length); };
           assembled.appendChild(chip);
         });
         shuffled.forEach((w,idx)=>{
@@ -1005,7 +1101,7 @@ const App = (() => {
           const remaining = totalW - used;
           for(let k=0;k<remaining;k++){
             const chip=document.createElement('div'); chip.className='word-chip'; chip.textContent=w;
-            chip.onclick=()=>{ arrangeChosen.push(w); renderChips(); setCheckEnabled(arrangeChosen.length===q.words.length); };
+            chip.onclick=()=>{ Sound.tap(); arrangeChosen.push(w); renderChips(); setCheckEnabled(arrangeChosen.length===q.words.length); };
             bank.appendChild(chip);
             break;
           }
@@ -1026,10 +1122,10 @@ const App = (() => {
         d.dataset.key=item.key; d.dataset.side=item.side;
         d.onclick=()=>{
           if(d.classList.contains('matched')) return;
-          if(!matchSel){ matchSel=d; d.classList.add('sel'); return; }
+          if(!matchSel){ matchSel=d; d.classList.add('sel'); Sound.tap(); return; }
           if(matchSel===d) return;
           if(matchSel.dataset.side===d.dataset.side){
-            matchSel.classList.remove('sel'); matchSel=d; d.classList.add('sel'); return;
+            matchSel.classList.remove('sel'); matchSel=d; d.classList.add('sel'); Sound.tap(); return;
           }
           if(matchSel.dataset.key===d.dataset.key){
             matchSel.classList.remove('sel'); matchSel.classList.add('matched');
@@ -1091,6 +1187,7 @@ const App = (() => {
       State.streak++;
       updateComboUI();
       toast(mult>1 ? `✅ صحيح! +${gainedXp} XP (كومبو x${mult})` : `✅ إجابة صحيحة! +${gainedXp} XP`);
+      setTimeout(()=>Sound.coin(), 150);
     } else {
       Sound.wrong();
       wrongAttempts++;
@@ -1132,9 +1229,10 @@ const App = (() => {
       ? `أكملت جميع ${currentStage.pairs.length} أزواج المطابقة`
       : `أتقنت جميع الأسئلة (${totalSteps()} من ${totalSteps()})`;
     if(wrongAttempts>0) msg += ` — بعد ${wrongAttempts} محاولة إضافية 💪`;
+    let unlockedNextWorld = false;
     if(wasBoss){
       const nextWorld = WORLDS.find(w=>w.requiresWorldComplete===WORLDS[State.currentWorld].id);
-      if(nextWorld) msg += ` — عالم "${nextWorld.name}" مفتوح الآن! 🌲`;
+      if(nextWorld){ msg += ` — عالم "${nextWorld.name}" مفتوح الآن! 🌲`; unlockedNextWorld = true; }
     }
     document.getElementById('completeMsg').textContent = msg;
 
@@ -1149,21 +1247,25 @@ const App = (() => {
     confettiBurst();
     saveProgress();
     if(wrongAttempts===0 && currentStage.type!=='match'){
-      setTimeout(()=>toast('⟩⟩ ACCESS GRANTED — تشغيل مثالي بدون أخطاء', true), 250);
+      setTimeout(()=>{ toast('⟩⟩ ACCESS GRANTED — تشغيل مثالي بدون أخطاء', true); Sound.achievement(); }, 250);
     }
+    // صوت إنهاء المرحلة يشتغل فوراً؛ فتح عالم جديد له صوت أوضح يميّزه عن إنهاء مرحلة عادية
+    if(unlockedNextWorld){ setTimeout(()=>Sound.worldUnlock(), 350); }
+    else { Sound.stageComplete(); }
     document.getElementById('modalComplete').classList.add('active');
     if(leveledUp){
       setTimeout(()=>{
         document.getElementById('newLevelNum').textContent = State.level;
       },0);
       window._pendingLevelUp = true;
-      Sound.levelup();
+      setTimeout(()=>Sound.levelup(), unlockedNextWorld ? 700 : 400);
     } else {
       window._pendingLevelUp = false;
     }
   }
 
   function closeComplete(){
+    Sound.click();
     document.getElementById('modalComplete').classList.remove('active');
     if(window._pendingLevelUp){
       document.getElementById('modalLevelUp').classList.add('active');
@@ -1172,10 +1274,12 @@ const App = (() => {
     }
   }
   function closeLevelUp(){
+    Sound.click();
     document.getElementById('modalLevelUp').classList.remove('active');
     exitStage();
   }
   function reviveHearts(){
+    // بدون صوت هنا عمداً — نفاد القلوب لحظة محايدة، ما نريد أي تعزيز صوتي (لا سلبي ولا إيجابي) مرتبط فيها
     State.hearts = MAX_HEARTS; State.lastHeartLossAt = 0; updateHud();
     saveProgress();
     document.getElementById('modalNoHearts').classList.remove('active');
