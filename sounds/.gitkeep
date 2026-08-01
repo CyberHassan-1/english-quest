@@ -1,0 +1,3 @@
+# Keep the sounds dir in GitHub (folder placeholder)
+
+This repository uses the sounds/ directory. Git does not track empty directories, so this file makes sure the directory exists.
