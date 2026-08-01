@@ -1,0 +1,16 @@
+{
+  "name": "English Quest — رحلة تعلم الإنجليزية",
+  "short_name": "English Quest",
+  "description": "رحلة تفاعلية لتعلم الإنجليزية بأسلوب ألعاب المراحل",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a0128",
+  "theme_color": "#0a0128",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
