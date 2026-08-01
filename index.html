@@ -734,7 +734,8 @@ function applyHeartRegen(){
   }
 }
 
-/* ================= PERSISTENCE (window.storage — survives closing the page) ================= */
+/* ================= PERSISTENCE (localStorage — works on any real website,
+   survives closing the browser/tab, and stays on the user's own device) ================= */
 function setSaveIndicator(mode){
   const dot = document.getElementById('saveDot');
   const text = document.getElementById('saveText');
@@ -745,20 +746,22 @@ function setSaveIndicator(mode){
 }
 async function loadProgress(){
   try{
-    const res = await window.storage.get(STORAGE_KEY);
-    if(res && res.value){
-      const saved = JSON.parse(res.value);
-      Object.assign(State, saved);
-      return true;
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const saved = JSON.parse(raw);
+      if(saved && typeof saved==='object'){
+        Object.assign(State, saved);
+        return true;
+      }
     }
-  }catch(e){ /* no save yet, or storage unavailable */ }
+  }catch(e){ /* no save yet, corrupted data, or storage blocked by the browser */ }
   return false;
 }
 async function saveProgress(){
   setSaveIndicator('saving');
   try{
-    const result = await window.storage.set(STORAGE_KEY, JSON.stringify(State));
-    setSaveIndicator(result ? 'saved' : 'error');
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(State));
+    setSaveIndicator('saved');
   }catch(e){ setSaveIndicator('error'); }
 }
 
