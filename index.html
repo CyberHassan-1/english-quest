@@ -430,9 +430,9 @@
       <h1 class="display glitch" data-text="English Quest">English Quest</h1>
       <p>رحلتك التفاعلية لتعلم الإنجليزية — من A1 إلى C2، عالم واحد كل مرة، ومهارة حقيقية تكتسبها كل مرحلة.</p>
       <div class="stat-row">
-        <div class="stat-card"><b>12</b><span>مرحلة جاهزة</span></div>
-        <div class="stat-card"><b>70+</b><span>كلمة</span></div>
-        <div class="stat-card"><b>2</b><span>عالم</span></div>
+        <div class="stat-card"><b>24</b><span>مرحلة جاهزة</span></div>
+        <div class="stat-card"><b>100+</b><span>كلمة وجملة</span></div>
+        <div class="stat-card"><b>4</b><span>عالم</span></div>
       </div>
       <button class="btn-primary" onclick="App.start()">ابدأ الرحلة</button>
       <br>
@@ -638,7 +638,62 @@ function decryptReveal(el, text, opts={}){
    The engine below reads this data generically — no per-stage code needed. */
 const WORLDS = [
   {
-    id:'village', name:'قرية البداية', level:'A1',
+    id:'alphabet', name:'الأساسيات — الحروف والأصوات', level:'قبل A1', icon:'🔤',
+    stages:[
+      { id:101, icon:'🔡', title:'حروف A-F', type:'mcq',
+        questions:[
+          {en:'A', ar:'الحرف A', options:['إيه','بي','سي','دي'], correct:0},
+          {en:'B', ar:'الحرف B', options:['إيه','بي','سي','دي'], correct:1},
+          {en:'C', ar:'الحرف C', options:['سي','دي','إي','إف'], correct:0},
+          {en:'D', ar:'الحرف D', options:['سي','دي','إي','إف'], correct:1},
+          {en:'E', ar:'الحرف E', options:['دي','إي','إف','جي'], correct:1},
+          {en:'F', ar:'الحرف F', options:['إي','إف','جي','إيتش'], correct:1},
+        ]},
+      { id:102, icon:'🔡', title:'حروف G-M', type:'mcq',
+        questions:[
+          {en:'G', ar:'الحرف G', options:['جي','إيتش','آي','جيه'], correct:0},
+          {en:'H', ar:'الحرف H', options:['جي','إيتش','آي','جيه'], correct:1},
+          {en:'I', ar:'الحرف I', options:['إيتش','آي','جيه','كيه'], correct:1},
+          {en:'J', ar:'الحرف J', options:['آي','جيه','كيه','إل'], correct:1},
+          {en:'K', ar:'الحرف K', options:['جيه','كيه','إل','إم'], correct:1},
+          {en:'L', ar:'الحرف L', options:['كيه','إل','إم','إن'], correct:1},
+          {en:'M', ar:'الحرف M', options:['إل','إم','إن','أو'], correct:1},
+        ]},
+      { id:103, icon:'🔤', title:'كبيرة وصغيرة (تطابق)', type:'match',
+        pairs:[ ['A','a'], ['B','b'], ['C','c'], ['D','d'], ['E','e'], ['F','f'] ] },
+      { id:104, icon:'🔡', title:'حروف N-T', type:'mcq',
+        questions:[
+          {en:'N', ar:'الحرف N', options:['إم','إن','أو','بي'], correct:1},
+          {en:'O', ar:'الحرف O', options:['إن','أو','بي','كيو'], correct:1},
+          {en:'P', ar:'الحرف P', options:['أو','بي','كيو','آر'], correct:1},
+          {en:'Q', ar:'الحرف Q', options:['بي','كيو','آر','إس'], correct:1},
+          {en:'R', ar:'الحرف R', options:['كيو','آر','إس','تي'], correct:1},
+          {en:'S', ar:'الحرف S', options:['آر','إس','تي','يو'], correct:1},
+          {en:'T', ar:'الحرف T', options:['إس','تي','يو','في'], correct:1},
+        ]},
+      { id:105, icon:'🔡', title:'حروف U-Z', type:'mcq',
+        questions:[
+          {en:'U', ar:'الحرف U', options:['تي','يو','في','دبليو'], correct:1},
+          {en:'V', ar:'الحرف V', options:['يو','في','دبليو','إكس'], correct:1},
+          {en:'W', ar:'الحرف W', options:['في','دبليو','إكس','واي'], correct:1},
+          {en:'X', ar:'الحرف X', options:['دبليو','إكس','واي','زد'], correct:1},
+          {en:'Y', ar:'الحرف Y', options:['إكس','واي','زد','إيه'], correct:1},
+          {en:'Z', ar:'الحرف Z', options:['واي','زد','إيه','بي'], correct:1},
+        ]},
+      { id:106, icon:'🔤', title:'كبيرة وصغيرة ٢ (تطابق)', type:'match',
+        pairs:[ ['G','g'], ['H','h'], ['M','m'], ['S','s'], ['W','w'], ['Z','z'] ] },
+      { id:107, icon:'👑', title:'تحدي الحروف', type:'mcq', boss:true,
+        questions:[
+          {en:'A', ar:'الحرف A', options:['إيه','بي','سي','دي'], correct:0},
+          {en:'H', ar:'الحرف H', options:['جي','إيتش','آي','جيه'], correct:1},
+          {en:'M', ar:'الحرف M', options:['إل','إم','إن','أو'], correct:1},
+          {en:'R', ar:'الحرف R', options:['كيو','آر','إس','تي'], correct:1},
+          {en:'Z', ar:'الحرف Z', options:['واي','زد','إيه','بي'], correct:1},
+        ]},
+    ]
+  },
+  {
+    id:'village', name:'قرية البداية', level:'A1', icon:'🏘️',
     stages:[
       { id:1, icon:'👋', title:'التحيات', type:'mcq',
         questions:[
@@ -674,7 +729,7 @@ const WORLDS = [
     ]
   },
   {
-    id:'forest', name:'الغابة الساحرة', level:'A2', requiresWorldComplete:'village',
+    id:'forest', name:'الغابة الساحرة', level:'A2', icon:'🌲', requiresWorldComplete:'village',
     stages:[
       { id:7, icon:'🐾', title:'الحيوانات', type:'mcq',
         questions:[
@@ -706,6 +761,46 @@ const WORLDS = [
           {en:'Monday', ar:'الإثنين', options:['الأحد','الإثنين','الجمعة','السبت'], correct:1},
           {en:'Morning', ar:'صباح', options:['ظهر','مساء','صباح','ليل'], correct:2},
           {en:'Lion', ar:'أسد', options:['نمر','أسد','فأر','بطة'], correct:1},
+        ]},
+    ]
+  },
+  {
+    id:'city', name:'المدينة — جمل حياتك اليومية', level:'A2+', icon:'🏙️', requiresWorldComplete:'forest',
+    stages:[
+      { id:201, icon:'⚽', title:'الهوايات', type:'write',
+        questions:[
+          {ar:'أنا أحب كرة القدم', answer:['i love football','i love soccer']},
+          {ar:'أنا ألعب كرة القدم', answer:['i play football','i play soccer']},
+          {ar:'هي تحب القراءة', answer:['she loves reading','she likes reading']},
+          {ar:'نحن نلعب كل يوم', answer:['we play every day','we play everyday']},
+        ]},
+      { id:202, icon:'🏠', title:'وصف نفسك', type:'write',
+        questions:[
+          {ar:'اسمي أحمد', answer:['my name is ahmed']},
+          {ar:'أنا من العراق', answer:['i am from iraq',"i'm from iraq"]},
+          {ar:'أنا طالب', answer:['i am a student',"i'm a student"]},
+          {ar:'هذا صديقي', answer:['this is my friend']},
+        ]},
+      { id:203, icon:'🕐', title:'روتيني اليومي', type:'write',
+        questions:[
+          {ar:'أنا أستيقظ الساعة السابعة', answer:['i wake up at seven','i wake up at 7']},
+          {ar:'أنا أذهب إلى العمل', answer:['i go to work']},
+          {ar:'هي تدرس كل ليلة', answer:['she studies every night']},
+          {ar:'نحن نأكل العشاء مع بعض', answer:['we eat dinner together']},
+        ]},
+      { id:204, icon:'💬', title:'محادثة قصيرة', type:'write',
+        questions:[
+          {ar:'كيف حالك؟', answer:['how are you']},
+          {ar:'أنا بخير، شكراً', answer:['i am fine thank you',"i'm fine thank you","i'm fine, thank you"]},
+          {ar:'ما اسمك؟', answer:['what is your name',"what's your name"]},
+          {ar:'سررت بلقائك', answer:['nice to meet you']},
+        ]},
+      { id:205, icon:'👑', title:'تحدي المدينة', type:'write', boss:true,
+        questions:[
+          {ar:'أنا أحب كرة القدم', answer:['i love football','i love soccer']},
+          {ar:'أنا من العراق', answer:['i am from iraq',"i'm from iraq"]},
+          {ar:'كيف حالك؟', answer:['how are you']},
+          {ar:'هذا صديقي', answer:['this is my friend']},
         ]},
     ]
   }
@@ -765,6 +860,25 @@ async function saveProgress(){
   }catch(e){ setSaveIndicator('error'); }
 }
 
+/* ================= FLEXIBLE ANSWER CHECKING =================
+   Lets a fill-in-the-blank or free-sentence question accept several correct
+   phrasings (e.g. "I love football" AND "I play football") instead of one
+   rigid exact string — case/punctuation/extra-space differences don't count
+   as wrong. */
+function normalizeAnswerText(s){
+  return String(s||'')
+    .toLowerCase()
+    .trim()
+    .replace(/[.!?,;:'"]/g,'')
+    .replace(/\s+/g,' ');
+}
+function matchesAnswer(userInput, acceptable){
+  const norm = normalizeAnswerText(userInput);
+  if(!norm) return false;
+  const list = Array.isArray(acceptable) ? acceptable : [acceptable];
+  return list.some(a => normalizeAnswerText(a) === norm);
+}
+
 /* ================= APP ================= */
 const App = (() => {
   let currentStage = null, correctCount = 0, wrongAttempts = 0, sessionXp=0, sessionCoins=0;
@@ -808,7 +922,9 @@ const App = (() => {
     t.textContent = msg;
     t.classList.toggle('achievement', achievement);
     t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'), achievement?3000:2200);
+    const dur = achievement ? 3000 : Math.min(4200, 2000 + msg.length*25);
+    clearTimeout(t._hideTimer);
+    t._hideTimer = setTimeout(()=>t.classList.remove('show'), dur);
   }
 
   function confettiBurst(){
@@ -870,7 +986,7 @@ const App = (() => {
   function renderMap(){
     const world = WORLDS[State.currentWorld];
     document.getElementById('worldTitle').innerHTML =
-      `${world.id==='forest'?'🌲':'🏘️'} ${world.name} <span style="font-size:13px; color:var(--text-dim); font-weight:400;">— ${world.level}</span>`;
+      `${world.icon||'🏘️'} ${world.name} <span style="font-size:13px; color:var(--text-dim); font-weight:400;">— ${world.level}</span>`;
     const doneCount = world.stages.filter(s=>State.completed[s.id]).length;
     document.getElementById('sectorTag').textContent =
       `SECTOR-0${State.currentWorld+1} // ${doneCount}/${world.stages.length} CLEARED`;
@@ -976,8 +1092,24 @@ const App = (() => {
           <div class="prompt-sub">تلميح: ${q.hint} <button class="speak-btn" id="fillSpeak" title="استمع للجملة">🔊</button></div>
         </div>
         <input class="fill-input" id="fillInput" placeholder="اكتب الكلمة بالإنجليزية" autocomplete="off">`;
-      document.getElementById('fillSpeak').onclick = (e)=> Voice.speak(q.sentence.replace('____', q.answer), e.currentTarget);
+      document.getElementById('fillSpeak').onclick = (e)=> Voice.speak(q.sentence.replace('____', Array.isArray(q.answer)?q.answer[0]:q.answer), e.currentTarget);
       const input = document.getElementById('fillInput');
+      input.addEventListener('input', ()=> setCheckEnabled(input.value.trim().length>0));
+      input.focus();
+    }
+
+    else if(type==='write'){
+      const q = currentStage.questions[queue[0]];
+      const answerList = Array.isArray(q.answer) ? q.answer : [q.answer];
+      area.innerHTML = `
+        <div class="q-card">
+          <div class="prompt-sub" style="margin-bottom:10px;">ترجم الجملة للإنجليزية</div>
+          <div class="prompt-en" style="font-size:19px;">${q.ar}</div>
+          <div class="prompt-sub" style="margin-top:10px;">استمع للجملة كمرجع <button class="speak-btn" id="writeSpeak" title="استمع للجملة">🔊</button></div>
+        </div>
+        <input class="fill-input" id="writeInput" placeholder="اكتب الجملة كاملة بالإنجليزية" autocomplete="off">`;
+      document.getElementById('writeSpeak').onclick = (e)=> Voice.speak(answerList[0], e.currentTarget);
+      const input = document.getElementById('writeInput');
       input.addEventListener('input', ()=> setCheckEnabled(input.value.trim().length>0));
       input.focus();
     }
@@ -1074,9 +1206,15 @@ const App = (() => {
       });
     } else if(type==='fill'){
       const q = currentStage.questions[queue[0]];
-      const val = document.getElementById('fillInput').value.trim().toLowerCase();
-      isCorrect = val === q.answer.toLowerCase();
+      const val = document.getElementById('fillInput').value;
+      isCorrect = matchesAnswer(val, q.answer);
       const input = document.getElementById('fillInput');
+      input.style.borderColor = isCorrect ? 'var(--teal)' : 'var(--coral)';
+    } else if(type==='write'){
+      const q = currentStage.questions[queue[0]];
+      const val = document.getElementById('writeInput').value;
+      isCorrect = matchesAnswer(val, q.answer);
+      const input = document.getElementById('writeInput');
       input.style.borderColor = isCorrect ? 'var(--teal)' : 'var(--coral)';
     } else if(type==='arrange'){
       const q = currentStage.questions[queue[0]];
@@ -1104,7 +1242,13 @@ const App = (() => {
       State.streak = 0;
       updateHud();
       if(State.hearts===0){ saveProgress(); document.getElementById('modalNoHearts').classList.add('active'); return; }
-      toast('❌ خطأ — بيرجع هذا السؤال لآخر الطابور');
+      if((type==='write' || type==='fill') && currentStage.questions[queue[0]]){
+        const ans = currentStage.questions[queue[0]].answer;
+        const example = Array.isArray(ans) ? ans[0] : ans;
+        toast('❌ خطأ — مثال جواب مقبول: '+example);
+      } else {
+        toast('❌ خطأ — بيرجع هذا السؤال لآخر الطابور');
+      }
     }
     updateHud();
 
