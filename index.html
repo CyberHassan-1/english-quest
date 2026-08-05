@@ -669,7 +669,6 @@ for(let start=1, idx=0; start<=91; start+=10, idx++){
 }
 const WORLDS = [
   {
-   {
     id:'basics', name:'الأساسيات', level:'قبل A1 → A1', icon:'🌟',
     stages:[
       // ===== إلزامي: الحوار البسيط (5 مراحل) — هذا وحده يفتح الأبواب الأربعة =====
@@ -763,15 +762,16 @@ const WORLDS = [
         ]},
 
       // ===== اختياري: الأرقام 1-100 (10 مراحل، مولّدة تلقائياً) =====
-      ...NUMBER_STAGES,
+     ...NUMBER_STAGES,
     ]
   },
+  {
     id:'dialogue', name:'تطوير الحوار', level:'A2 → B1', icon:'💬', requiresWorldComplete:'basics',
     stages:[
       { id:201, icon:'👋', title:'تحية وتعارف', type:'write',
         questions:[
           {ar:'مرحباً، كيف حالك؟', answer:['hello how are you','hi how are you']},
-          {ar:'أنا بخير، شكراً لك', answer:['i am fine thank you',"i'm fine thank you","i'm fine, thank you"]}
+          {ar:'أنا بخير، شكراً لك', answer:['i am fine thank you',"i'm fine thank you","i'm fine, thank you"]},
           {ar:'ما اسمك؟', answer:['what is your name',"what's your name"]},
           {ar:'سررت بلقائك', answer:['nice to meet you']},
         ]},
