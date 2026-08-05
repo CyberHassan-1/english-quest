@@ -636,32 +636,103 @@ function decryptReveal(el, text, opts={}){
    Adding a new world = adding another object to WORLDS.
    Adding a new stage = adding another object to a world's `stages` array.
    The engine below reads this data generically — no per-stage code needed. */
+   /* ================= NUMBER STAGE GENERATOR =================
+   يبني 10 مراحل اختيارية (1-10، 11-20 ... 91-100) تلقائياً بدل كتابة
+   100 رقم يدوياً. */
+function numberWordEn(n){
+  const ones=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten',
+    'Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  const tens=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  if(n===100) return 'One Hundred';
+  if(n<20) return ones[n];
+  const t=Math.floor(n/10), r=n%10;
+  return tens[t] + (r ? '-'+ones[r] : '');
+}
+function numberWordAr(n){
+  const ones=['','واحد','اثنان','ثلاثة','أربعة','خمسة','ستة','سبعة','ثمانية','تسعة','عشرة',
+    'أحد عشر','اثنا عشر','ثلاثة عشر','أربعة عشر','خمسة عشر','ستة عشر','سبعة عشر','ثمانية عشر','تسعة عشر'];
+  const tens=['','','عشرون','ثلاثون','أربعون','خمسون','ستون','سبعون','ثمانون','تسعون'];
+  if(n===100) return 'مئة';
+  if(n<20) return ones[n];
+  const t=Math.floor(n/10), r=n%10;
+  return r ? ones[r]+' و'+tens[t] : tens[t];
+}
+const NUMBER_STAGES = [];
+for(let start=1, idx=0; start<=91; start+=10, idx++){
+  const end = Math.min(start+9, 100);
+  const pairs = [];
+  for(let n=start; n<=end; n++) pairs.push([ numberWordEn(n), numberWordAr(n)+' ('+n+')' ]);
+  NUMBER_STAGES.push({
+    id: 810+idx, icon:'🔢', title:`أرقام ${start}-${end}`, type:'match', category:'numbers',
+    pairs
+  });
+}
 const WORLDS = [
   {
-    id:'alphabet', name:'الأساسيات — الحروف والأصوات', level:'قبل A1', icon:'🔤',
+   {
+    id:'basics', name:'الأساسيات', level:'قبل A1 → A1', icon:'🌟',
     stages:[
-      { id:101, icon:'🔡', title:'حروف A-F', type:'mcq',
+      // ===== إلزامي: الحوار البسيط (5 مراحل) — هذا وحده يفتح الأبواب الأربعة =====
+      { id:901, icon:'👋', title:'الترحيب', type:'arrange', category:'dialogue',
         questions:[
-          {en:'A', ar:'الحرف A', options:['إيه','بي','سي','دي'], correct:0},
-          {en:'B', ar:'الحرف B', options:['إيه','بي','سي','دي'], correct:1},
+          {words:['Hello,','good','morning'], answer:'Hello, good morning', ar:'مرحباً، صباح الخير'},
+          {words:['How','are','you','today?'], answer:'How are you today?', ar:'كيف حالك اليوم؟'},
+          {words:['Nice','to','meet','you'], answer:'Nice to meet you', ar:'تشرفنا بلقائك'},
+          {words:['See','you','later'], answer:'See you later', ar:'إلى اللقاء'},
+        ]},
+      { id:902, icon:'🙂', title:'السؤال عن الحال', type:'arrange', category:'dialogue',
+        questions:[
+          {dir:'ar', prompt:'I am fine, thank you', words:['أنا','بخير','شكراً'], answer:'أنا بخير شكراً'},
+          {dir:'ar', prompt:'What is wrong?', words:['ما','الأمر؟'], answer:'ما الأمر؟'},
+          {dir:'ar', prompt:'I am a little tired', words:['أنا','متعب','قليلاً'], answer:'أنا متعب قليلاً'},
+          {dir:'ar', prompt:'Everything is great', words:['كل','شيء','رائع'], answer:'كل شيء رائع'},
+        ]},
+      { id:903, icon:'☕', title:'شرب القهوة', type:'write', category:'dialogue',
+        questions:[
+          {ar:'هل تريد فنجان قهوة؟', answer:['would you like a cup of coffee','do you want a cup of coffee']},
+          {ar:'نعم من فضلك، بدون سكر', answer:['yes please, no sugar','yes please without sugar']},
+          {ar:'هل تفضل الشاي أم القهوة؟', answer:['do you prefer tea or coffee']},
+          {ar:'القهوة ساخنة جداً', answer:['the coffee is very hot']},
+        ]},
+      { id:904, icon:'💼', title:'السؤال عن المهنة', type:'write', category:'dialogue',
+        questions:[
+          {ar:'ماذا تعمل؟', answer:['what do you do','what is your job']},
+          {ar:'أنا مهندس', answer:['i am an engineer',"i'm an engineer"]},
+          {ar:'أين تعمل؟', answer:['where do you work']},
+          {ar:'أعمل في شركة كبيرة', answer:['i work at a big company','i work in a big company']},
+        ]},
+      { id:905, icon:'👑', title:'تحدي الأساسيات', type:'write', boss:true, category:'dialogue',
+        questions:[
+          {ar:'مرحباً، صباح الخير', answer:['hello, good morning']},
+          {ar:'أنا بخير شكراً', answer:['i am fine thank you',"i'm fine thank you"]},
+          {ar:'هل تريد فنجان قهوة؟', answer:['would you like a cup of coffee','do you want a cup of coffee']},
+          {ar:'ماذا تعمل؟', answer:['what do you do','what is your job']},
+          {ar:'أنا مهندس', answer:['i am an engineer',"i'm an engineer"]},
+        ]},
+
+      // ===== اختياري: الحروف (7 مراحل) =====
+      { id:101, icon:'🔡', title:'حروف A-F', type:'mcq', category:'letters',
+        questions:[
+          {en:'A', ar:'الحرف A', options:['إي','بي','سي','دي'], correct:0},
+          {en:'B', ar:'الحرف B', options:['إي','بي','سي','دي'], correct:1},
           {en:'C', ar:'الحرف C', options:['سي','دي','إي','إف'], correct:0},
           {en:'D', ar:'الحرف D', options:['سي','دي','إي','إف'], correct:1},
           {en:'E', ar:'الحرف E', options:['دي','إي','إف','جي'], correct:1},
-          {en:'F', ar:'الحرف F', options:['إي','إف','جي','إيتش'], correct:1},
+          {en:'F', ar:'الحرف F', options:['إي','إف','جي','إج'], correct:1},
         ]},
-      { id:102, icon:'🔡', title:'حروف G-M', type:'mcq',
+      { id:102, icon:'🔡', title:'حروف G-M', type:'mcq', category:'letters',
         questions:[
-          {en:'G', ar:'الحرف G', options:['جي','إيتش','آي','جيه'], correct:0},
-          {en:'H', ar:'الحرف H', options:['جي','إيتش','آي','جيه'], correct:1},
+          {en:'G', ar:'الحرف G', options:['جي','إج','آي','جيَي'], correct:0},
+          {en:'H', ar:'الحرف H', options:['جي','إج','آي','جيَي'], correct:1},
           {en:'I', ar:'الحرف I', options:['إيتش','آي','جيه','كيه'], correct:1},
-          {en:'J', ar:'الحرف J', options:['آي','جيه','كيه','إل'], correct:1},
+        {en:'J', ar:'الحرف J', options:['آي','جيَي','كي','إل'], correct:1},
           {en:'K', ar:'الحرف K', options:['جيه','كيه','إل','إم'], correct:1},
-          {en:'L', ar:'الحرف L', options:['كيه','إل','إم','إن'], correct:1},
+          {en:'L', ar:'الحرف L', options:['كي','إل','إم','إن'], correct:1},
           {en:'M', ar:'الحرف M', options:['إل','إم','إن','أو'], correct:1},
         ]},
-      { id:103, icon:'🔤', title:'كبيرة وصغيرة (تطابق)', type:'match',
+      { id:103, icon:'🔤', title:'كبيرة وصغيرة (تطابق)', type:'match', category:'letters',
         pairs:[ ['A','a'], ['B','b'], ['C','c'], ['D','d'], ['E','e'], ['F','f'] ] },
-      { id:104, icon:'🔡', title:'حروف N-T', type:'mcq',
+      { id:104, icon:'🔡', title:'حروف N-T', type:'mcq', category:'letters',
         questions:[
           {en:'N', ar:'الحرف N', options:['إم','إن','أو','بي'], correct:1},
           {en:'O', ar:'الحرف O', options:['إن','أو','بي','كيو'], correct:1},
@@ -671,7 +742,7 @@ const WORLDS = [
           {en:'S', ar:'الحرف S', options:['آر','إس','تي','يو'], correct:1},
           {en:'T', ar:'الحرف T', options:['إس','تي','يو','في'], correct:1},
         ]},
-      { id:105, icon:'🔡', title:'حروف U-Z', type:'mcq',
+      { id:105, icon:'🔡', title:'حروف U-Z', type:'mcq', category:'letters',
         questions:[
           {en:'U', ar:'الحرف U', options:['تي','يو','في','دبليو'], correct:1},
           {en:'V', ar:'الحرف V', options:['يو','في','دبليو','إكس'], correct:1},
@@ -680,9 +751,9 @@ const WORLDS = [
           {en:'Y', ar:'الحرف Y', options:['إكس','واي','زد','إيه'], correct:1},
           {en:'Z', ar:'الحرف Z', options:['واي','زد','إيه','بي'], correct:1},
         ]},
-      { id:106, icon:'🔤', title:'كبيرة وصغيرة ٢ (تطابق)', type:'match',
+      { id:106, icon:'🔤', title:'كبيرة وصغيرة ٢ (تطابق)', type:'match', category:'letters',
         pairs:[ ['G','g'], ['H','h'], ['M','m'], ['S','s'], ['W','w'], ['Z','z'] ] },
-      { id:107, icon:'👑', title:'تحدي الحروف', type:'mcq', boss:true,
+      { id:107, icon:'👑', title:'تحدي الحروف', type:'mcq', boss:true, category:'letters',
         questions:[
           {en:'A', ar:'الحرف A', options:['إيه','بي','سي','دي'], correct:0},
           {en:'H', ar:'الحرف H', options:['جي','إيتش','آي','جيه'], correct:1},
@@ -690,119 +761,254 @@ const WORLDS = [
           {en:'R', ar:'الحرف R', options:['كيو','آر','إس','تي'], correct:1},
           {en:'Z', ar:'الحرف Z', options:['واي','زد','إيه','بي'], correct:1},
         ]},
+
+      // ===== اختياري: الأرقام 1-100 (10 مراحل، مولّدة تلقائياً) =====
+      ...NUMBER_STAGES,
     ]
   },
-  {
-    id:'village', name:'قرية البداية', level:'A1', icon:'🏘️',
+    id:'dialogue', name:'تطوير الحوار', level:'A2 → B1', icon:'💬', requiresWorldComplete:'basics',
     stages:[
-      { id:1, icon:'👋', title:'التحيات', type:'mcq',
+      { id:201, icon:'👋', title:'تحية وتعارف', type:'write',
         questions:[
-          {en:'Hello', ar:'مرحباً', options:['مرحباً','وداعاً','شكراً','آسف'], correct:0},
-          {en:'Good morning', ar:'صباح الخير', options:['مساء الخير','صباح الخير','تصبح على خير','مع السلامة'], correct:1},
-          {en:'Thank you', ar:'شكراً لك', options:['من فضلك','عفواً','شكراً لك','آسف'], correct:2},
-          {en:'Goodbye', ar:'وداعاً', options:['مرحباً','وداعاً','نعم','لا'], correct:1},
-          {en:'Please', ar:'من فضلك', options:['من فضلك','شكراً','آسف','أهلاً'], correct:0},
+          {ar:'مرحباً، كيف حالك؟', answer:['hello how are you','hi how are you']},
+          {ar:'أنا بخير، شكراً لك', answer:['i am fine thank you',"i'm fine thank you","i'm fine, thank you"]}
+          {ar:'ما اسمك؟', answer:['what is your name',"what's your name"]},
+          {ar:'سررت بلقائك', answer:['nice to meet you']},
         ]},
-      { id:2, icon:'🔢', title:'الأرقام', type:'match',
-        pairs:[ ['One','واحد'], ['Two','اثنان'], ['Three','ثلاثة'], ['Four','أربعة'] ] },
-      { id:3, icon:'🎨', title:'الألوان', type:'fill',
-        questions:[
-          {sentence:'The sky is ____', answer:'blue', hint:'أزرق'},
-          {sentence:'The apple is ____', answer:'red', hint:'أحمر'},
-          {sentence:'The grass is ____', answer:'green', hint:'أخضر'},
-        ]},
-      { id:4, icon:'👨‍👩‍👧', title:'العائلة', type:'arrange',
-        questions:[
-          {words:['This','is','my','mother'], answer:'This is my mother', ar:'هذه أمي'},
-          {words:['I','love','my','family'], answer:'I love my family', ar:'أحب عائلتي'},
-        ]},
-      { id:5, icon:'🍎', title:'الطعام', type:'match',
-        pairs:[ ['Apple','تفاحة'], ['Bread','خبز'], ['Water','ماء'], ['Milk','حليب'] ] },
-      { id:6, icon:'👑', title:'تحدي الزعيم', type:'mcq', boss:true,
-        questions:[
-          {en:'Good morning', ar:'صباح الخير', options:['مساء الخير','صباح الخير','وداعاً','آسف'], correct:1},
-          {en:'Apple', ar:'تفاحة', options:['خبز','حليب','تفاحة','ماء'], correct:2},
-          {en:'Three', ar:'ثلاثة', options:['اثنان','ثلاثة','أربعة','واحد'], correct:1},
-          {en:'Blue', ar:'أزرق', options:['أحمر','أخضر','أزرق','أصفر'], correct:2},
-          {en:'Family', ar:'عائلة', options:['صديق','عائلة','معلم','جار'], correct:1},
-        ]},
-    ]
-  },
-  {
-    id:'forest', name:'الغابة الساحرة', level:'A2', icon:'🌲', requiresWorldComplete:'village',
-    stages:[
-      { id:7, icon:'🐾', title:'الحيوانات', type:'mcq',
-        questions:[
-          {en:'Dog', ar:'كلب', options:['قطة','كلب','أسد','طائر'], correct:1},
-          {en:'Cat', ar:'قطة', options:['قطة','كلب','فأر','حصان'], correct:0},
-          {en:'Bird', ar:'طائر', options:['سمكة','طائر','نمر','فيل'], correct:1},
-          {en:'Fish', ar:'سمكة', options:['سمكة','دب','أرنب','ذئب'], correct:0},
-          {en:'Lion', ar:'أسد', options:['نمر','أسد','فأر','بطة'], correct:1},
-        ]},
-      { id:8, icon:'⛅', title:'الطقس', type:'match',
-        pairs:[ ['Sunny','مشمس'], ['Rainy','ماطر'], ['Windy','عاصف'], ['Cloudy','غائم'] ] },
-      { id:9, icon:'📅', title:'أيام الأسبوع', type:'fill',
-        questions:[
-          {sentence:'Today is ____ (Sunday)', answer:'sunday', hint:'الأحد'},
-          {sentence:'Tomorrow is ____ (Monday)', answer:'monday', hint:'الإثنين'},
-          {sentence:'The weekend starts on ____ (Friday)', answer:'friday', hint:'الجمعة'},
-        ]},
-      { id:10, icon:'🏃', title:'الأفعال اليومية', type:'arrange',
-        questions:[
-          {words:['She','goes','to','school'], answer:'She goes to school', ar:'هي تذهب إلى المدرسة'},
-          {words:['We','play','every','day'], answer:'We play every day', ar:'نحن نلعب كل يوم'},
-        ]},
-      { id:11, icon:'⏰', title:'الوقت', type:'match',
-        pairs:[ ['Morning','صباح'], ['Noon','ظهر'], ['Evening','مساء'], ['Night','ليل'] ] },
-      { id:12, icon:'👑', title:'تحدي الزعيم', type:'mcq', boss:true,
-        questions:[
-          {en:'Dog', ar:'كلب', options:['قطة','كلب','أسد','طائر'], correct:1},
-          {en:'Rainy', ar:'ماطر', options:['مشمس','ماطر','عاصف','غائم'], correct:1},
-          {en:'Monday', ar:'الإثنين', options:['الأحد','الإثنين','الجمعة','السبت'], correct:1},
-          {en:'Morning', ar:'صباح', options:['ظهر','مساء','صباح','ليل'], correct:2},
-          {en:'Lion', ar:'أسد', options:['نمر','أسد','فأر','بطة'], correct:1},
-        ]},
-    ]
-  },
-  {
-    id:'city', name:'المدينة — جمل حياتك اليومية', level:'A2+', icon:'🏙️', requiresWorldComplete:'forest',
-    stages:[
-      { id:201, icon:'⚽', title:'الهوايات', type:'write',
-        questions:[
-          {ar:'أنا أحب كرة القدم', answer:['i love football','i love soccer']},
-          {ar:'أنا ألعب كرة القدم', answer:['i play football','i play soccer']},
-          {ar:'هي تحب القراءة', answer:['she loves reading','she likes reading']},
-          {ar:'نحن نلعب كل يوم', answer:['we play every day','we play everyday']},
-        ]},
-      { id:202, icon:'🏠', title:'وصف نفسك', type:'write',
+      { id:202, icon:'🙋', title:'وصف نفسك', type:'write',
         questions:[
           {ar:'اسمي أحمد', answer:['my name is ahmed']},
           {ar:'أنا من العراق', answer:['i am from iraq',"i'm from iraq"]},
           {ar:'أنا طالب', answer:['i am a student',"i'm a student"]},
-          {ar:'هذا صديقي', answer:['this is my friend']},
+          {ar:'عمري عشرين سنة', answer:['i am twenty years old',"i'm twenty years old"]},
         ]},
-      { id:203, icon:'🕐', title:'روتيني اليومي', type:'write',
+      { id:203, icon:'❓', title:'أسئلة شخصية', type:'write',
+        questions:[
+          {ar:'كم عمرك؟', answer:['how old are you']},
+          {ar:'أين تسكن؟', answer:['where do you live']},
+          {ar:'ماذا تعمل؟', answer:['what do you do']},
+          {ar:'من أي بلد أنت؟', answer:['where are you from']},
+        ]},
+      { id:204, icon:'⚽', title:'الهوايات والاهتمامات', type:'write',
+        questions:[
+          {ar:'أنا أحب كرة القدم', answer:['i love football','i love soccer']},
+          {ar:'أنا ألعب كرة القدم كل يوم', answer:['i play football every day','i play soccer every day']},
+          {ar:'هي تحب القراءة', answer:['she loves reading','she likes reading']},
+          {ar:'ما هي هوايتك؟', answer:['what is your hobby',"what's your hobby"]},
+        ]},
+      { id:205, icon:'🕐', title:'الروتين اليومي', type:'write',
         questions:[
           {ar:'أنا أستيقظ الساعة السابعة', answer:['i wake up at seven','i wake up at 7']},
           {ar:'أنا أذهب إلى العمل', answer:['i go to work']},
           {ar:'هي تدرس كل ليلة', answer:['she studies every night']},
           {ar:'نحن نأكل العشاء مع بعض', answer:['we eat dinner together']},
         ]},
-      { id:204, icon:'💬', title:'محادثة قصيرة', type:'write',
+      { id:206, icon:'💭', title:'التعبير عن رأيك', type:'write',
         questions:[
-          {ar:'كيف حالك؟', answer:['how are you']},
-          {ar:'أنا بخير، شكراً', answer:['i am fine thank you',"i'm fine thank you","i'm fine, thank you"]},
-          {ar:'ما اسمك؟', answer:['what is your name',"what's your name"]},
-          {ar:'سررت بلقائك', answer:['nice to meet you']},
+          {ar:'أعتقد أن هذا جيد', answer:['i think this is good']},
+          {ar:'أنا أوافق', answer:['i agree']},
+          {ar:'أنا لا أوافق', answer:['i disagree',"i don't agree"]},
+          {ar:'هذا مثير للاهتمام', answer:['this is interesting']},
         ]},
-      { id:205, icon:'👑', title:'تحدي المدينة', type:'write', boss:true,
+      { id:207, icon:'🙏', title:'طلب واستفسار', type:'write',
         questions:[
-          {ar:'أنا أحب كرة القدم', answer:['i love football','i love soccer']},
+          {ar:'هل يمكنك مساعدتي؟', answer:['can you help me']},
+          {ar:'أين الحمام؟', answer:['where is the bathroom']},
+          {ar:'كم سعر هذا؟', answer:['how much is this']},
+          {ar:'هل تتكلم العربية؟', answer:['do you speak arabic']},
+        ]},
+      { id:208, icon:'👑', title:'تحدي الحوار', type:'write', boss:true,
+        questions:[
+          {ar:'ما اسمك؟', answer:['what is your name',"what's your name"]},
           {ar:'أنا من العراق', answer:['i am from iraq',"i'm from iraq"]},
-          {ar:'كيف حالك؟', answer:['how are you']},
-          {ar:'هذا صديقي', answer:['this is my friend']},
+          {ar:'كم عمرك؟', answer:['how old are you']},
+          {ar:'هل يمكنك مساعدتي؟', answer:['can you help me']},
+          {ar:'أعتقد أن هذا جيد', answer:['i think this is good']},
+        ]},
+      { id:209, icon:'😊', title:'التعبير عن المشاعر', type:'write',
+        questions:[
+          {ar:'أنا سعيد اليوم', answer:['i am happy today',"i'm happy today"]},
+          {ar:'أنا متعب قليلاً', answer:['i am a little tired',"i'm a little tired"]},
+          {ar:'أنا متحمس لهذا', answer:['i am excited about this',"i'm excited about this"]},
+          {ar:'هذا يزعجني', answer:['this bothers me','this annoys me']},
+        ]},
+      { id:210, icon:'📖', title:'الحديث عن الماضي', type:'write',
+        questions:[
+          {ar:'ذهبت إلى السوق أمس', answer:['i went to the market yesterday']},
+          {ar:'أنا شاهدت فيلماً جيداً', answer:['i watched a good movie']},
+          {ar:'هي زارت صديقتها الأسبوع الماضي', answer:['she visited her friend last week']},
+          {ar:'نحن سافرنا إلى بغداد', answer:['we traveled to baghdad']},
+        ]},
+      { id:211, icon:'🔮', title:'الحديث عن المستقبل', type:'write',
+        questions:[
+          {ar:'سأذهب إلى الجامعة غداً', answer:['i will go to university tomorrow',"i'm going to university tomorrow"]},
+          {ar:'أخطط لتعلم الإنكليزية', answer:['i plan to learn english','i am planning to learn english']},
+          {ar:'هي ستزور عائلتها الأسبوع القادم', answer:['she will visit her family next week']},
+          {ar:'ماذا ستفعل بعد التخرج؟', answer:['what will you do after graduation']},
+        ]},
+      { id:212, icon:'📞', title:'مكالمة هاتفية', type:'write',
+        questions:[
+          {ar:'مرحباً، من المتحدث؟', answer:['hello who is speaking',"hello, who is this"]},
+          {ar:'هل يمكنني التحدث مع أحمد؟', answer:['can i speak to ahmed','can i talk to ahmed']},
+          {ar:'سأتصل بك لاحقاً', answer:['i will call you later',"i'll call you later"]},
+          {ar:'انتظر لحظة من فضلك', answer:['wait a moment please','one moment please']},
+        ]},
+      { id:213, icon:'🗺️', title:'إعطاء اتجاهات', type:'write',
+        questions:[
+          {ar:'اذهب يميناً', answer:['go right','turn right']},
+          {ar:'المحل قريب من هنا', answer:['the store is close to here','the store is near here']},
+          {ar:'استمر مستقيماً', answer:['go straight','continue straight']},
+          {ar:'أين أقرب مستشفى؟', answer:['where is the nearest hospital']},
+        ]},
+      { id:214, icon:'🤝', title:'الاتفاق والاختلاف بالرأي', type:'write',
+        questions:[
+          {ar:'أوافقك الرأي تماماً', answer:['i completely agree with you','i totally agree with you']},
+          {ar:'أنا أرى الأمر بشكل مختلف', answer:['i see it differently','i see things differently']},
+          {ar:'هذا صحيح إلى حد ما', answer:['that is somewhat true',"that's somewhat true"]},
+          {ar:'دعنا نتفق على عدم الاتفاق', answer:["let's agree to disagree"]},
+        ]},
+      { id:215, icon:'⚠️', title:'الشكوى وحل المشكلة', type:'write',
+        questions:[
+          {ar:'لدي مشكلة مع هذا الطلب', answer:['i have a problem with this order']},
+          {ar:'هذا لا يعمل بشكل صحيح', answer:['this is not working properly',"this isn't working properly"]},
+          {ar:'أريد استرجاع أموالي', answer:['i want a refund','i want my money back']},
+          {ar:'هل يمكنك إصلاح هذا؟', answer:['can you fix this']},
+        ]},
+      { id:216, icon:'👑', title:'تحدي الحوار المتقدم', type:'write', boss:true,
+        questions:[
+          {ar:'أنا متحمس لهذا', answer:['i am excited about this',"i'm excited about this"]},
+          {ar:'ذهبت إلى السوق أمس', answer:['i went to the market yesterday']},
+          {ar:'سأذهب إلى الجامعة غداً', answer:['i will go to university tomorrow',"i'm going to university tomorrow"]},
+          {ar:'هل يمكنني التحدث مع أحمد؟', answer:['can i speak to ahmed','can i talk to ahmed']},
+          {ar:'أوافقك الرأي تماماً', answer:['i completely agree with you','i totally agree with you']},
+        ]},
+      { id:217, icon:'✈️', title:'المطار والسفر', type:'write',
+        questions:[
+          {ar:'أين بوابة الصعود؟', answer:['where is the boarding gate','where is the departure gate']},
+          {ar:'هذه حقيبتي', answer:['this is my bag','this is my luggage']},
+          {ar:'لقد فاتتني رحلتي', answer:['i missed my flight']},
+          {ar:'أين نقطة استلام الحقائب؟', answer:['where is baggage claim']},
+        ]},
+      { id:218, icon:'🛂', title:'الجوازات والحدود', type:'write',
+        questions:[
+          {ar:'هذا جواز سفري', answer:['this is my passport']},
+          {ar:'أنا هنا للسياحة', answer:['i am here for tourism','i am here as a tourist']},
+          {ar:'سأبقى لمدة أسبوعين', answer:['i will stay for two weeks',"i'm staying for two weeks"]},
+          {ar:'هذا هو عنوان إقامتي', answer:['this is my address','this is where i am staying']},
+        ]},
+      { id:219, icon:'🏨', title:'الفندق', type:'write',
+        questions:[
+          {ar:'لدي حجز باسم أحمد', answer:['i have a reservation under ahmed','i have a booking under the name ahmed']},
+          {ar:'هل يمكنني الحصول على غرفة أخرى؟', answer:['can i get another room']},
+          {ar:'ما هو وقت المغادرة؟', answer:['what is the checkout time',"what's the check-out time"]},
+          {ar:'الواي فاي لا يعمل', answer:['the wifi is not working',"the wi-fi isn't working"]},
+        ]},
+      { id:220, icon:'🍔', title:'طلب الطعام بالمطعم', type:'write',
+        questions:[
+          {ar:'طاولة لشخصين من فضلك', answer:['a table for two please']},
+          {ar:'ما الذي تنصح به؟', answer:['what do you recommend']},
+          {ar:'أنا حساسية من المكسرات', answer:['i am allergic to nuts',"i'm allergic to nuts"]},
+          {ar:'الفاتورة من فضلك', answer:['the bill please','check please']},
+        ]},
+      { id:221, icon:'🚕', title:'وسائل النقل', type:'write',
+        questions:[
+          {ar:'خذني إلى هذا العنوان', answer:['take me to this address']},
+          {ar:'أين محطة القطار؟', answer:['where is the train station']},
+          {ar:'كم تبعد المسافة سيراً على الأقدام؟', answer:['how far is it on foot','how far is it walking']},
+          {ar:'متى تصل الحافلة القادمة؟', answer:['when does the next bus arrive']},
+        ]},
+      { id:222, icon:'🛍️', title:'التسوق والمساومة', type:'write',
+        questions:[
+          {ar:'هل يمكنني تجربة هذا؟', answer:['can i try this on']},
+          {ar:'هل عندكم مقاس أكبر؟', answer:['do you have a bigger size']},
+          {ar:'هل تقبلون الدفع بالبطاقة؟', answer:['do you accept card payment','do you take card']},
+          {ar:'أريد إرجاع هذا المنتج', answer:['i want to return this item','i want to return this']},
+        ]},
+      { id:223, icon:'🚑', title:'الطوارئ الطبية', type:'write',
+        questions:[
+          {ar:'أحتاج مساعدة طبية', answer:['i need medical help']},
+          {ar:'اتصل بالإسعاف من فضلك', answer:['please call an ambulance','call an ambulance please']},
+          {ar:'أنا أشعر بألم هنا', answer:['i feel pain here','it hurts here']},
+          {ar:'أين أقرب صيدلية؟', answer:['where is the nearest pharmacy']},
+        ]},
+      { id:224, icon:'👑', title:'تحدي البقاء بالسفر', type:'write', boss:true,
+        questions:[
+          {ar:'لقد فاتتني رحلتي', answer:['i missed my flight']},
+          {ar:'لدي حجز باسم أحمد', answer:['i have a reservation under ahmed','i have a booking under the name ahmed']},
+          {ar:'طاولة لشخصين من فضلك', answer:['a table for two please']},
+          {ar:'خذني إلى هذا العنوان', answer:['take me to this address']},
+          {ar:'أحتاج مساعدة طبية', answer:['i need medical help']},
+        ]},
+      { id:225, icon:'🏠', title:'البحث عن سكن', type:'write',
+        questions:[
+          {ar:'أبحث عن شقة للإيجار', answer:['i am looking for an apartment to rent',"i'm looking for an apartment to rent"]},
+          {ar:'كم الإيجار الشهري؟', answer:['how much is the monthly rent']},
+          {ar:'هل السكن مفروش؟', answer:['is it furnished']},
+          {ar:'أريد معاينة الشقة', answer:['i want to view the apartment','i would like to see the apartment']},
+        ]},
+      { id:226, icon:'📝', title:'عقد الإيجار', type:'write',
+        questions:[
+          {ar:'كم مدة العقد؟', answer:['how long is the contract','what is the length of the lease']},
+          {ar:'هل التأمين مسترجع؟', answer:['is the deposit refundable']},
+          {ar:'أين أوقع هنا؟', answer:['where do i sign here','where do i sign']},
+          {ar:'هل الفواتير مشمولة؟', answer:['are the bills included','are utilities included']},
+        ]},
+      { id:227, icon:'🏦', title:'فتح حساب بنكي', type:'write',
+        questions:[
+          {ar:'أريد فتح حساب بنكي', answer:['i want to open a bank account',"i'd like to open a bank account"]},
+          {ar:'ما هي المستندات المطلوبة؟', answer:['what documents do i need','what documents are required']},
+          {ar:'أريد بطاقة صراف آلي', answer:['i want a debit card','i need an atm card']},
+          {ar:'أين أقرب فرع للبنك؟', answer:['where is the nearest bank branch']},
+        ]},
+      { id:228, icon:'💳', title:'التعامل مع البنك', type:'write',
+        questions:[
+          {ar:'أريد تحويل أموال', answer:['i want to transfer money','i need to send money']},
+          {ar:'ما هو رصيدي؟', answer:['what is my balance',"what's my account balance"]},
+          {ar:'لقد فقدت بطاقتي', answer:['i lost my card']},
+          {ar:'أريد كشف حساب', answer:['i want a bank statement','i need a statement']},
+        ]},
+      { id:229, icon:'🆔', title:'المستندات الرسمية', type:'write',
+        questions:[
+          {ar:'أحتاج إثبات سكن', answer:['i need proof of address']},
+          {ar:'أين أقدم على رقم الضمان الاجتماعي؟', answer:['where do i apply for a social security number']},
+          {ar:'هل يمكنني الحصول على نسخة؟', answer:['can i get a copy']},
+          {ar:'هذا هو رقم هويتي', answer:['this is my id number']},
+        ]},
+      { id:230, icon:'🏢', title:'دوائر حكومية', type:'write',
+        questions:[
+          {ar:'أين مكتب الهجرة؟', answer:['where is the immigration office']},
+          {ar:'أحتاج تجديد تأشيرتي', answer:['i need to renew my visa']},
+          {ar:'كم يستغرق الإجراء؟', answer:['how long does the process take']},
+          {ar:'هل أحتاج موعد مسبق؟', answer:['do i need an appointment']},
+        ]},
+      { id:231, icon:'⚡', title:'خدمات المرافق', type:'write',
+        questions:[
+          {ar:'أريد الاشتراك بالكهرباء', answer:['i want to set up electricity','i need to connect electricity']},
+          {ar:'متى موعد قراءة العداد؟', answer:['when is the meter reading']},
+          {ar:'أحتاج خط إنترنت', answer:['i need an internet connection','i want to get internet']},
+          {ar:'الفاتورة أعلى من المعتاد', answer:['the bill is higher than usual']},
+        ]},
+      { id:232, icon:'👑', title:'تحدي الاستقرار', type:'write', boss:true,
+        questions:[
+          {ar:'أبحث عن شقة للإيجار', answer:['i am looking for an apartment to rent',"i'm looking for an apartment to rent"]},
+          {ar:'أريد فتح حساب بنكي', answer:['i want to open a bank account',"i'd like to open a bank account"]},
+          {ar:'أحتاج إثبات سكن', answer:['i need proof of address']},
+          {ar:'أين مكتب الهجرة؟', answer:['where is the immigration office']},
+          {ar:'أريد الاشتراك بالكهرباء', answer:['i want to set up electricity','i need to connect electricity']},
         ]},
     ]
+  },
+  {
+    id:'ai_learning', name:'الذكاء الصناعي بالإنكليزي', level:'قريباً', icon:'🤖', requiresWorldComplete:'basics',
+    stages:[]
+  },
+  {
+    id:'cybersecurity', name:'الأمن السيبراني بالإنكليزي', level:'قريباً', icon:'🛡️', requiresWorldComplete:'basics',
+    stages:[]
+  },
+ {
+    id:'programming', name:'البرمجة بالإنكليزي', level:'قريباً', icon:'💻', requiresWorldComplete:'basics',
+    stages:[]
   }
 ];
 
@@ -961,7 +1167,8 @@ const App = (() => {
   function worldUnlocked(world){
     if(!world.requiresWorldComplete) return true;
     const req = WORLDS.find(w=>w.id===world.requiresWorldComplete);
-    return req.stages.every(s=>State.completed[s.id]);
+    const requiredStages = req.stages.filter(s => !s.category || s.category==='dialogue');
+    return requiredStages.every(s=>State.completed[s.id]);
   }
 
   function renderWorldTabs(){
@@ -1098,32 +1305,41 @@ const App = (() => {
       input.focus();
     }
 
-    else if(type==='write'){
+   else if(type==='write'){
       const q = currentStage.questions[queue[0]];
       const answerList = Array.isArray(q.answer) ? q.answer : [q.answer];
       area.innerHTML = `
         <div class="q-card">
           <div class="prompt-sub" style="margin-bottom:10px;">ترجم الجملة للإنجليزية</div>
           <div class="prompt-en" style="font-size:19px;">${q.ar}</div>
-          <div class="prompt-sub" style="margin-top:10px;">استمع للجملة كمرجع <button class="speak-btn" id="writeSpeak" title="استمع للجملة">🔊</button></div>
+          <div class="prompt-sub" style="margin-top:10px;">استمع للجملة كمرجع <button class="speak-btn" id="writeSpeak" title="استمع للجملة">🔊</button> <button class="speak-btn" id="writeHint" title="تلميح — يظهر الجواب">💡</button></div>
+          <div class="prompt-sub" id="writeHintText" style="margin-top:8px; color:var(--gold); display:none;"></div>
         </div>
         <input class="fill-input" id="writeInput" placeholder="اكتب الجملة كاملة بالإنجليزية" autocomplete="off">`;
       document.getElementById('writeSpeak').onclick = (e)=> Voice.speak(answerList[0], e.currentTarget);
+      document.getElementById('writeHint').onclick = ()=>{
+        const hintEl = document.getElementById('writeHintText');
+        hintEl.textContent = 'الجواب: ' + answerList[0];
+        hintEl.style.display = 'block';
+      };
       const input = document.getElementById('writeInput');
       input.addEventListener('input', ()=> setCheckEnabled(input.value.trim().length>0));
       input.focus();
     }
 
-    else if(type==='arrange'){
+   else if(type==='arrange'){
       const q = currentStage.questions[queue[0]];
+      const isAr = q.dir === 'ar';
       arrangeChosen = [];
       const shuffled = [...q.words].sort(()=>Math.random()-.5);
+      const promptText = isAr ? (q.prompt || '') : q.ar;
+      const label = isAr ? 'رتب الكلمات لتكوين الترجمة بالعربي' : 'رتب الكلمات لتكوين الجملة بالإنجليزي';
       area.innerHTML = `
         <div class="q-card">
-          <div class="prompt-sub" style="margin-bottom:8px;">رتب الكلمات لتكوين الجملة</div>
-          <div class="prompt-en" style="font-size:17px; color:var(--text-dim);">${q.ar}</div>
-          <div class="assembled" id="assembledArea"></div>
-          <div class="word-bank" id="wordBank"></div>
+          <div class="prompt-sub" style="margin-bottom:8px;">${label}</div>
+          <div class="prompt-en" style="font-size:17px; color:var(--text-dim); ${isAr?'direction:ltr;':''}">${promptText}</div>
+          <div class="assembled" id="assembledArea" style="${isAr?'direction:rtl;':''}"></div>
+          <div class="word-bank" id="wordBank" style="${isAr?'direction:rtl;':''}"></div>
         </div>`;
       const bank = document.getElementById('wordBank');
       const assembled = document.getElementById('assembledArea');
